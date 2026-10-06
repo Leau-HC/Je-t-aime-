@@ -3,93 +3,241 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#2563eb">
+    <meta name="theme-color" content="#1e1b4b">
     <title>Une petite question</title>
     <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
       * {
         box-sizing: border-box;
       }
 
+      [hidden] {
+        display: none !important;
+      }
+
       body {
         min-height: 100vh;
+        min-height: 100svh;
         margin: 0;
         display: grid;
         place-items: center;
+        overflow: hidden;
         padding: 24px;
-        background: linear-gradient(135deg, #1d4ed8, #60a5fa);
-        color: #172554;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(ellipse at 15% 15%, rgb(96 165 250 / 35%), transparent 38%),
+          radial-gradient(ellipse at 85% 85%, rgb(244 114 182 / 24%), transparent 42%),
+          linear-gradient(135deg, #172554, #312e81 55%, #1e1b4b);
+        color: #312e51;
+      }
+
+      .floating-heart {
+        position: fixed;
+        z-index: -1;
+        color: rgb(255 255 255 / 22%);
+        font-size: clamp(24px, 5vw, 54px);
+        animation: float 7s ease-in-out infinite;
+        pointer-events: none;
+      }
+
+      .heart-one {
+        top: 14%;
+        left: 13%;
+      }
+
+      .heart-two {
+        right: 14%;
+        bottom: 17%;
+        font-size: clamp(18px, 4vw, 38px);
+        animation-delay: -3s;
+      }
+
+      .heart-three {
+        top: 22%;
+        right: 25%;
+        font-size: clamp(14px, 3vw, 28px);
+        animation-delay: -5s;
       }
 
       main {
+        position: relative;
         width: min(100%, 440px);
-        padding: 48px 32px;
-        border-radius: 24px;
-        background: #fff;
-        box-shadow: 0 24px 60px rgb(23 37 84 / 20%);
+        padding: 44px 32px 36px;
+        border: 1px solid rgb(255 255 255 / 75%);
+        border-radius: 28px;
+        background: rgb(255 255 255 / 95%);
+        box-shadow: 0 28px 80px rgb(10 10 40 / 35%);
         text-align: center;
+        animation: appear 650ms cubic-bezier(.2, .8, .2, 1) both;
+      }
+
+      .heart-icon {
+        display: grid;
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 20px;
+        place-items: center;
+        border-radius: 50%;
+        background: #fff0f3;
+        color: #f05b78;
+        font-size: 32px;
       }
 
       h1 {
-        margin: 0 0 28px;
-        font-size: clamp(1.8rem, 6vw, 2.4rem);
+        margin: 0 0 30px;
+        color: #272344;
+        font-size: clamp(1.7rem, 6vw, 2.25rem);
+        line-height: 1.2;
       }
 
       .choices {
         display: flex;
         justify-content: center;
-        gap: 16px;
+        gap: 12px;
       }
 
       button {
-        min-width: 110px;
-        padding: 12px 24px;
-        border: 0;
+        min-width: 120px;
+        min-height: 48px;
+        padding: 12px 22px;
+        border: 2px solid transparent;
         border-radius: 999px;
-        background: #2563eb;
-        color: #fff;
+        background: #f05b78;
+        color: white;
         font: inherit;
         font-weight: 700;
         cursor: pointer;
-        transition: background-color 150ms ease, transform 150ms ease;
+        transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
       }
 
       button:hover {
-        transform: translateY(-2px);
-        background: #1d4ed8;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 18px rgb(240 91 120 / 28%);
+      }
+
+      button:active {
+        transform: translateY(0);
       }
 
       button:focus-visible {
-        outline: 3px solid #93c5fd;
+        outline: 3px solid #818cf8;
         outline-offset: 4px;
       }
 
+      .button-no {
+        border-color: #e5e3ef;
+        background: white;
+        color: #625f78;
+      }
+
+      .button-no:hover {
+        border-color: #c4c0d5;
+        background: #f8f7fc;
+        box-shadow: 0 8px 18px rgb(49 46 129 / 10%);
+      }
+
       #response {
-        min-height: 1.5em;
-        margin: 24px 0 0;
-        color: #1d4ed8;
-        font-size: 1.5rem;
+        min-height: 1.4em;
+        margin: 28px 0 0;
+        color: #e34e70;
+        font-size: clamp(1.4rem, 5vw, 1.7rem);
         font-weight: 700;
+      }
+
+      #response:not(:empty) {
+        animation: response-in 400ms ease both;
+      }
+
+      .replay {
+        min-width: auto;
+        min-height: 44px;
+        margin-top: 12px;
+        border-color: transparent;
+        background: #eef2ff;
+        color: #4338ca;
+        animation: response-in 400ms ease both;
+      }
+
+      .replay:hover {
+        background: #e0e7ff;
+        box-shadow: 0 8px 18px rgb(49 46 129 / 10%);
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(-8deg); }
+        50% { transform: translateY(-18px) rotate(8deg); }
+      }
+
+      @keyframes appear {
+        from { opacity: 0; transform: translateY(14px) scale(.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      @keyframes response-in {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @media (max-width: 380px) {
+        main {
+          padding: 36px 20px 28px;
+        }
+
+        button {
+          min-width: 0;
+          flex: 1;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
       }
     </style>
   </head>
   <body>
+    <span class="floating-heart heart-one" aria-hidden="true">♥</span>
+    <span class="floating-heart heart-two" aria-hidden="true">♥</span>
+    <span class="floating-heart heart-three" aria-hidden="true">♥</span>
     <main>
+      <div class="heart-icon" aria-hidden="true">♥</div>
       <h1>Est-ce que tu m’aimes&nbsp;?</h1>
       <div class="choices">
-        <button type="button" data-answer="oui">Oui</button>
-        <button type="button" data-answer="non">Non</button>
+        <button type="button" data-answer="oui">Oui 💖</button>
+        <button class="button-no" type="button" data-answer="non">Non</button>
       </div>
       <p id="response" aria-live="polite"></p>
+      <button class="replay" id="replay" type="button" hidden>Rejouer</button>
     </main>
 
     <script>
       const response = document.querySelector("#response");
+      const replay = document.querySelector("#replay");
+      const choices = document.querySelector(".choices");
 
       document.querySelectorAll("[data-answer]").forEach((button) => {
         button.addEventListener("click", () => {
-          response.textContent = button.dataset.answer === "oui" ? "Moi aussi" : "Dommage";
+          const answer = button.dataset.answer;
+          response.textContent = answer === "oui" ? "Moi aussi 💙" : "Dommage 💔";
+          choices.hidden = true;
+          replay.hidden = false;
         });
+      });
+
+      replay.addEventListener("click", () => {
+        response.textContent = "";
+        choices.hidden = false;
+        replay.hidden = true;
+        choices.querySelector("button").focus();
       });
     </script>
   </body>
