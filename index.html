@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#2563eb">
+    <title>Une petite question</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: linear-gradient(135deg, #1d4ed8, #60a5fa);
+        color: #172554;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      main {
+        width: min(100%, 440px);
+        padding: 48px 32px;
+        border-radius: 24px;
+        background: #fff;
+        box-shadow: 0 24px 60px rgb(23 37 84 / 20%);
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0 0 28px;
+        font-size: clamp(1.8rem, 6vw, 2.4rem);
+      }
+
+      .choices {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+      }
+
+      button {
+        min-width: 110px;
+        padding: 12px 24px;
+        border: 0;
+        border-radius: 999px;
+        background: #2563eb;
+        color: #fff;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 150ms ease, transform 150ms ease;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        background: #1d4ed8;
+      }
+
+      button:focus-visible {
+        outline: 3px solid #93c5fd;
+        outline-offset: 4px;
+      }
+
+      #response {
+        min-height: 1.5em;
+        margin: 24px 0 0;
+        color: #1d4ed8;
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Est-ce que tu m’aimes&nbsp;?</h1>
+      <div class="choices">
+        <button type="button" data-answer="oui">Oui</button>
+        <button type="button" data-answer="non">Non</button>
+      </div>
+      <p id="response" aria-live="polite"></p>
+    </main>
+
+    <script>
+      const response = document.querySelector("#response");
+
+      document.querySelectorAll("[data-answer]").forEach((button) => {
+        button.addEventListener("click", () => {
+          response.textContent = button.dataset.answer === "oui" ? "Moi aussi" : "Dommage";
+        });
+      });
+    </script>
+  </body>
+</html>
