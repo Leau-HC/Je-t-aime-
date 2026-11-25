@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#1e1b4b">
-    <title>Une petite question</title>
+    <title>Questionnaire d’amour</title>
     <style>
       :root {
         color-scheme: light;
@@ -172,6 +172,34 @@
         animation: response-in 400ms ease both;
       }
 
+      #progress {
+        display: block;
+        width: 100%;
+        height: 10px;
+        margin: 24px 0 0;
+        overflow: hidden;
+        border: 0;
+        border-radius: 999px;
+        background: #e8ebf3;
+        accent-color: #3158c9;
+      }
+
+      #progress::-webkit-progress-bar {
+        border-radius: 999px;
+        background: #e8ebf3;
+      }
+
+      #progress::-webkit-progress-value {
+        border-radius: 999px;
+        background: #3158c9;
+        transition: width 200ms ease;
+      }
+
+      #progress::-moz-progress-bar {
+        border-radius: 999px;
+        background: #3158c9;
+      }
+
       .replay {
         width: auto;
         min-height: 44px;
@@ -231,38 +259,109 @@
     <span class="floating-heart heart-two" aria-hidden="true">♥</span>
     <span class="floating-heart heart-three" aria-hidden="true">♥</span>
     <main>
-      <div class="heart-icon" aria-hidden="true">♥</div>
-      <p class="eyebrow">Une question pour toi</p>
-      <h1>Est-ce que tu m’aimes&nbsp;?</h1>
-      <p class="description">Choisis la réponse qui te ressemble.</p>
+      <div class="heart-icon" id="heart-icon" role="img" aria-label="Cœur">♥</div>
+      <p class="eyebrow" id="question-number">Question 1 sur 10</p>
+      <h1 id="question">Est-ce que tu aimes passer du temps avec cette personne&nbsp;?</h1>
+      <p class="description" id="description">Réponds aux 10 questions. Chaque « Oui » vaut 10 points.</p>
+      <progress id="progress" value="1" max="10" aria-label="Progression du questionnaire"></progress>
       <div class="choices">
         <button type="button" data-answer="oui">Oui</button>
         <button class="button-no" type="button" data-answer="non">Non</button>
       </div>
       <p id="response" aria-live="polite"></p>
-      <button class="replay" id="replay" type="button" hidden>Rejouer</button>
+      <button class="replay" id="replay" type="button" hidden>Recommencer</button>
     </main>
 
+    <script src="questions.js"></script>
     <script>
+      const questionBank = window.questionnaire;
+      if (!Array.isArray(questionBank) || questionBank.length !== 100 || new Set(questionBank).size !== 100 || questionBank.some((question) => typeof question !== "string")) {
+        throw new Error("La banque doit contenir exactement 100 questions différentes.");
+      }
+
+      function getRandomQuestions() {
+        const shuffled = [...questionBank];
+        for (let index = shuffled.length - 1; index > 0; index -= 1) {
+          const randomIndex = Math.floor(Math.random() * (index + 1));
+          [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+        }
+        return shuffled.slice(0, 10);
+      }
+
+      let questions = getRandomQuestions();
+      const questionNumber = document.querySelector("#question-number");
+      const questionTitle = document.querySelector("#question");
+      const description = document.querySelector("#description");
+      const progress = document.querySelector("#progress");
+      const heartIcon = document.querySelector("#heart-icon");
       const response = document.querySelector("#response");
       const replay = document.querySelector("#replay");
       const choices = document.querySelector(".choices");
+      const answerButtons = document.querySelectorAll("[data-answer]");
+      let currentQuestion = 0;
+      let yesCount = 0;
 
-      document.querySelectorAll("[data-answer]").forEach((button) => {
+      function showQuestion() {
+        questionNumber.textContent = `Question ${currentQuestion + 1} sur ${questions.length}`;
+        questionTitle.textContent = questions[currentQuestion];
+        description.textContent = "Réponds aux 10 questions. Chaque « Oui » vaut 10 points.";
+        progress.value = currentQuestion + 1;
+      }
+
+      function showResult() {
+        const score = yesCount * 10;
+        questionNumber.textContent = "Résultat";
+        questionTitle.textContent = `Ton score d’amour : ${score} %`;
+        description.textContent = `Tu as répondu « Oui » à ${yesCount} question${yesCount === 1 ? "" : "s"} sur 10.`;
+        response.textContent = `Ton score est de ${score} %.`;
+        if (score >= 80) {
+          heartIcon.textContent = "❤️";
+          heartIcon.setAttribute("aria-label", "Cœur rouge");
+        } else if (score >= 50) {
+          heartIcon.textContent = "💙";
+          heartIcon.setAttribute("aria-label", "Cœur bleu");
+        } else if (score >= 30) {
+          heartIcon.textContent = "💚";
+          heartIcon.setAttribute("aria-label", "Cœur vert");
+        } else {
+          heartIcon.textContent = "💔";
+          heartIcon.setAttribute("aria-label", "Cœur brisé");
+        }
+        progress.value = questions.length;
+        choices.hidden = true;
+        replay.hidden = false;
+      }
+
+      answerButtons.forEach((button) => {
         button.addEventListener("click", () => {
-          const answer = button.dataset.answer;
-          response.textContent = answer === "oui" ? "Moi aussi 💙" : "Dommage 💔";
-          choices.hidden = true;
-          replay.hidden = false;
+          if (button.dataset.answer === "oui") {
+            yesCount += 1;
+          }
+
+          currentQuestion += 1;
+          if (currentQuestion < questions.length) {
+            showQuestion();
+            return;
+          }
+
+          showResult();
         });
       });
 
       replay.addEventListener("click", () => {
+        questions = getRandomQuestions();
+        currentQuestion = 0;
+        yesCount = 0;
+        heartIcon.textContent = "♥";
+        heartIcon.setAttribute("aria-label", "Cœur");
         response.textContent = "";
         choices.hidden = false;
         replay.hidden = true;
+        showQuestion();
         choices.querySelector("button").focus();
       });
+
+      showQuestion();
     </script>
   </body>
 </html>
